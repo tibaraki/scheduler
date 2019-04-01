@@ -1,4 +1,5 @@
 import pkg from './package'
+const webpack = require('webpack')
 
 export default {
   mode: 'spa',
@@ -42,6 +43,7 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/moment'
   ],
   /*
   ** Axios module configuration
@@ -58,6 +60,9 @@ export default {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
-    }
+    },
+    plugins: [
+      new webpack.ProvidePlugin({ '_': 'lodash' })
+    ]
   }
 }
