@@ -45,14 +45,15 @@ export default {
     rectAttrs() {
       return {
         x: 2,
-        y: 2,
+        y: 3,
         width: this.days * this.gridWidth - 4,
-        height: this.task.thickness * this.gridHeight - 4,
-        stroke: "dimgray",
+        height: this.task.thickness * this.gridHeight - 6,
+        stroke: "gray",
+        'stroke-width': 1,
         fill: this.task.fillColor,
         'fill-opacity': 0.6,
-        rx: 3,
-        ry: 3
+        rx: 1,
+        ry: 1
       }
     },
     textAttrs() {
@@ -60,7 +61,7 @@ export default {
         x: 8,
         y: this.gridHeight - 8,
         'font-size': this.gridHeight - 16,
-        fill: "dimgray"
+        fill: "black"
       }
     }
   },
@@ -81,9 +82,15 @@ export default {
       this.$set(this.task, "offset", this.task.offset + delta)
     },
     thickness(delta) {
-      if (this.task.thickness + delta < 0) return
+      if (this.task.thickness + delta <= 0) return
       this.$set(this.task, "thickness", this.task.thickness + delta)
     }
   }
 }
 </script>
+
+<style scoped>
+g:focus {
+  outline: navy dashed 2px;
+}
+</style>

@@ -9,7 +9,8 @@ g(@click="$emit('unselectTask')")
       rect(
         v-bind="grid.attrs"
         fill-opacity="0.5"
-        @dblclick.stop="onClickGrid"
+        @click.shift.prevent.stop="onShiftClickGrid"
+        @dblclick.prevent.stop="onDoubleClickGrid"
         )
   g.date-titles
     g(
@@ -32,6 +33,7 @@ g(@click="$emit('unselectTask')")
       task(
         :task="task"
         :gridHeight="gridHeight"
+        :gridWidth="gridWidth"
         @click="onClickTask"
         @delete="onDeleteTask"
         )
@@ -57,7 +59,7 @@ export default {
     },
     topMargin: {
       type: Number,
-      default: 100
+      default: 82
     }
   },
   computed: {
@@ -78,37 +80,50 @@ export default {
           y: 0,
           width: this.gridWidth,
           height: "100%",
-          fill: i % 2 === 0 ? "silver" : "lightgray"
+          fill: this.$moment().isSame(this.startDate.clone().add(i, 'days'), 'day') ? 'indianred' : (i % 2 === 1 ? "white" : "mistyrose")
         }
       }))
     },
     dateTitles() {
       return [...Array(this.days)].map((_, i) => ({
         index: i,
-        text: this.startDate.clone().add(i, 'days').format("YY/MM/DD"),
+        text: this.startDate.clone().add(i, 'days').format("YYYY - MM - DD"),
         attrs: {
           x: 5,
-          y: 4,
-          "font-size": this.gridWidth - 8,
-          transform: "rotate(90 5 4)"
+          y: 0,
+          "font-size": this.gridWidth - 14,
+          transform: "rotate(90 5 4)",
+          fill: "gray"
         }
       }))
     },
     tasks() {
       return _.sortBy(this.schedule.tasks, ['order'])
     },
+    notes() {
+      return this.schedule.notes
+    },
     maxOrder() {
+      if (this.tasks.length === 0) return 1
       return this.tasks[this.tasks.length-1].order
     },
     maxId() {
-      return Math.max(...this.tasks.map(task => task.id))
+      return Math.max(...this.tasks.map(task => task.id)) || 1
+    },
+    maxNoteId() {
+      return Math.max(...this.notes.map(note => note.id)) || 1
     }
   },
   methods: {
     onClickTask(obj) {
       this.$emit("selectTask", obj)
     },
-    onClickGrid(event) {
+    onShiftClickGrid(event) {
+      const date = this.startDate.clone().add(Math.floor(event.offsetX / this.gridWidth), "days").format("YYYY-MM-DD")
+      const offset = Math.max(Math.floor((event.offsetY - this.topMargin) / this.gridHeight), 0)
+      this.newNote(date, offset)
+    },
+    onDoubleClickGrid(event) {
       const date = this.startDate.clone().add(Math.floor(event.offsetX / this.gridWidth), "days").format("YYYY-MM-DD")
       const offset = Math.max(Math.floor((event.offsetY - this.topMargin) / this.gridHeight), 0)
       this.newTask(date, offset)
@@ -118,13 +133,24 @@ export default {
         {
           id: this.maxId + 1,
           startDate: date,
-          endDate: this.$moment(date).add(7, "days").format("YYYY-MM-DD"),
+          endDate: this.$moment(date).add(2, "days").format("YYYY-MM-DD"),
           title: "new task",
           description: "description",
           order: this.maxOrder + 1,
           offset: offset,
           thickness: 1,
           fillColor: "coral"
+        }
+      )
+    },
+    newNote(date, offset) {
+      this.schedule.notes.push(
+        {
+          id: this.maxNoteId + 1,
+          date: date,
+          offset: offset,
+          text: '',
+          fillColor: 'maroon'
         }
       )
     },
