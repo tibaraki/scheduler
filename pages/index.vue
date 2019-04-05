@@ -1,103 +1,57 @@
 <template lang='pug'>
+.new
+  .range
+    input(
+      type="text"
+      v-model="start"
+      )
+    span 〜
+    input(
+      type="text"
+      v-model="end"
+      )
+  .submit
+    button(
+      @click="createSchedule"
+      ) スケジュールの作成
 </template>
 
 <script>
-const DATA = () => ({
-    startDate: '2019-03-01',
-    endDate: '2019-04-30',
-    notes: [
-      {
-        id: 1,
-        date: '2019-03-20',
-        offset: 2,
-        text: 'メモのサンプル',
-        fillColor: 'gold'
-      }
-    ],
-    tasks: [
-      {
-        id: 1,
-        startDate: '2019-03-01',
-        endDate: '2019-03-27',
-        title: "長いスケジュールのサンプル",
-        description: "description",
-        order: 1,
-        offset: 0,
-        thickness: 1,
-        fillColor: "coral"
-      },
-      {
-        id: 2,
-        startDate: '2019-03-04',
-        endDate: '2019-03-07',
-        title: "サンプル",
-        description: "description",
-        order: 2,
-        offset: 1,
-        thickness: 2,
-        fillColor: "lavender"
-      },
-    ]
-  })
-
 export default {
-  async fetch({ app, redirect, query }) {
-    const data = DATA()
-    data.updatedAt = app.$moment().toISOString()
-    if (query.start && query.end) {
-      data.startDate = query.start
-      data.endDate = query.end
-      data.notes = []
-      data.tasks = []
+  data() {
+    return {
+      start: '2019-4-1',
+      end: '2019-5-31'
     }
-    const ref = await app.$db.collection('schedules').add(data)
-    redirect(`/schedules/${ref.id}`)
+  },
+  methods: {
+    createSchedule() {
+      this.$router.push({ path: 'new', query: {start: this.start, end: this.end} })
+    }
   }
 }
 </script>
 
 <style scoped>
-.root {
-  height: 100vh;
+.new {
+  padding: 20px;
 }
-.schedule-area {
-  height: 100%;
-  width: 100%;
-  overflow-x: scroll;
-  overflow-y: hidden;
-  position: relative;
-}
-.balloon {
-  position: fixed;
-  visibility: hidden;
-  border: 1px solid dimgray;
-  border-radius: 1px;
-  background-color: rgba(255,255,255,0.8);
-  opacity: 0;
-  transition: all .3s ease;
-}
-.balloon.show {
-  visibility: visible;
-  opacity: 1;
-}
-.form .range {
-  color: snow;
-  background-color: dimgray;
-  font-size: .6em;
-  padding: 1px 5px;
-  text-align: right;
-}
-.form .title-and-color {
-  display: flex;
-  padding: 5px;
-}
-.form .title, .form .color {
+.range  {
   display: flex;
 }
-.form .title {
-  margin-right: 5px;
+input {
+  border: 1px solid gray;
+  text-align: center;
+  width: 7em;
+  font-size: 1.05em;
 }
-.title input {
-  width: 16em;
+span {
+  background-color: gray;
+  color: white;
+  font-size: 1em;
+  padding: 0 3px;
+}
+.submit {
+  margin-top: 20px;
 }
 </style>

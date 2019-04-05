@@ -108,10 +108,12 @@ export default {
       return this.tasks[this.tasks.length-1].order
     },
     maxId() {
-      return Math.max(...this.tasks.map(task => task.id)) || 1
+      if (this.tasks.length === 0) return 1
+      return Math.max(...this.tasks.map(task => task.id))
     },
     maxNoteId() {
-      return Math.max(...this.notes.map(note => note.id)) || 1
+      if (this.notes.length === 0) return 1
+      return Math.max(...this.notes.map(note => note.id))
     }
   },
   methods: {
